@@ -1,0 +1,22 @@
+{
+  "name": "ristra_sgr_server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EnriqueSalazar/ristra_sgr_server.git"
+  },
+  "author": "EnriqueSalazar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EnriqueSalazar/ristra_sgr_server/issues"
+  },
+  "homepage": "https://github.com/EnriqueSalazar/ristra_sgr_server#readme",
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  }
+}
