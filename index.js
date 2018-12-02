@@ -38,7 +38,7 @@ const Questionario = sequelize.define('questionario', {
 });
 
 
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'];
 
 const TOKEN_PATH = 'token.json';
 
@@ -52,8 +52,8 @@ app.post('/data', (req, res) => {
   }))
   .then(questionario => {
     console.log(questionario.toJSON());
-    
-    authorize(credentials, listMajors);
+    authorize(credentials, listContent);
+    authorize(credentials, (auth) => updateContent(auth, questionario));
 
 	res.send(questionario.toJSON());
   });
@@ -63,6 +63,8 @@ app.post('/email/', (req, res) => {
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -119,20 +121,43 @@ function getNewToken(oAuth2Client, callback) {
  * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-function listMajors(auth) {
+function updateContent(auth, values) {
+	var spreadsheetId = '1lTE8PfFQIlOARtFybI3a8FlXyV8wixTVPtNi_Awuzw0';
+	  const sheets = google.sheets({version: 'v4', auth});
+	  sheets.spreadsheets.values.append({
+	    spreadsheetId,
+		range: 'Hoja 1',
+      valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
+      resource: {
+        values: [
+          ["Some value1", "Another value2"],
+          ["Some value", "Another value"]
+        ],
+},	  }, (err, res) => {
+	    if (err) return console.log('The API returned an error: ' + err);
+	    const rows = res.data.values;
+	    if (rows.length) {
+	      console.log('Rows:');
+	      console.dir(rows);
+	    } else {
+	      console.log('No data found.');
+	    }
+  });
+}
+
+function listContent(auth) {
+var spreadsheetId = '1lTE8PfFQIlOARtFybI3a8FlXyV8wixTVPtNi_Awuzw0';
   const sheets = google.sheets({version: 'v4', auth});
   sheets.spreadsheets.values.get({
-    spreadsheetId: '1lTE8PfFQIlOARtFybI3a8FlXyV8wixTVPtNi_Awuzw0',
+    spreadsheetId,
     range: 'Hoja 1!A1:B',
   }, (err, res) => {
     if (err) return console.log('The API returned an error: ' + err);
     const rows = res.data.values;
     if (rows.length) {
-      console.log('Name, Major:');
-      // Print columns A and E, which correspond to indices 0 and 4.
-      rows.map((row) => {
-        console.log(`${row[0]}, ${row[1]}`);
-      });
+      console.log('Rows:');
+      console.dir(rows);
     } else {
       console.log('No data found.');
     }
